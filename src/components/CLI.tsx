@@ -39,6 +39,11 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
 
+# Module-level imports for easier testing/mocking
+from .extractors.youtube import get_youtube_transcript, extract_video_id
+from .extractors.whisper_local import transcribe_local_audio
+from .generators.gemini_notes import generate_notes_smart
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,

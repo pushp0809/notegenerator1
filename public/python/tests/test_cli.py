@@ -217,3 +217,33 @@ class TestCLIProcessCommand:
         
         # Should handle the sentinel and generate notes
         assert mock_generate.called
+    
+    @patch('video_notes.cli.get_youtube_transcript')
+    @patch('video_notes.cli.generate_notes_smart')
+    def test_url_with_query_parameters(self, mock_generate, mock_transcript, tmp_path):
+        """Test URL with additional query parameters (like pp=...)."""
+        # URL with extra tracking parameters
+        url_with_params = "https://www.youtube.com/watch?v=po8ZFG0Xc4Q&pp=ygUKaXAgYWRkcmVzcw%3D%3D"
+        
+        # Mock transcript
+        mock_transcript.return_value = "[00:00] IP Addressing tutorial content"
+        
+        # Mock note generation
+        mock_generate.return_value = iter(["# IP Addressing Notes"])
+        
+        output_file = tmp_path / "output.md"
+        
+        result = runner.invoke(app, [
+            "process",
+            url_with_params,
+            "--output", str(output_file)
+        ])
+        
+        # Should successfully extract video ID and process
+        assert mock_transcript.called
+        assert mock_generate.called
+        assert output_file.exists()
+        
+        # Verify the correct video ID was extracted
+        call_args = mock_transcript.call_args
+        assert call_args[0][0] == url_with_params  # Full URL passed

@@ -69,6 +69,21 @@ class TestExtractVideoId:
         """Test that whitespace is stripped."""
         url = "  https://youtu.be/dQw4w9WgXcQ  "
         assert extract_video_id(url) == "dQw4w9WgXcQ"
+    
+    def test_url_with_query_parameters(self):
+        """Test extraction from URL with additional query parameters."""
+        url = "https://www.youtube.com/watch?v=po8ZFG0Xc4Q&pp=ygUKaXAgYWRkcmVzcw%3D%3D"
+        assert extract_video_id(url) == "po8ZFG0Xc4Q"
+    
+    def test_url_with_multiple_parameters(self):
+        """Test extraction from URL with multiple query parameters."""
+        url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=42s&list=PLxyz"
+        assert extract_video_id(url) == "dQw4w9WgXcQ"
+    
+    def test_url_with_fragment(self):
+        """Test extraction from URL with fragment identifier."""
+        url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ#t=10"
+        assert extract_video_id(url) == "dQw4w9WgXcQ"
 
 
 class TestGetYouTubeTranscript:

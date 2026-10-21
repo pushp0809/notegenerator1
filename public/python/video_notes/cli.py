@@ -4,34 +4,35 @@ video_notes.cli
 Production-grade CLI for converting videos to structured notes.
 
 Usage:
-    python -m video_notes.cli process <SOURCE> [OPTIONS]
+    python -m video_notes process <SOURCE> [OPTIONS]
 
 Examples:
     # YouTube video with captions
-    python -m video_notes.cli process "https://youtube.com/watch?v=dQw4w9WgXcQ"
+    python -m video_notes process "https://youtube.com/watch?v=dQw4w9WgXcQ"
     
     # Local video file with direct audio upload
-    python -m video_notes.cli process video.mp4 --direct-audio
+    python -m video_notes process video.mp4 --direct-audio
     
     # Custom output path and whisper model
-    python -m video_notes.cli process "https://youtu.be/xyz" -o notes.md --whisper-model small
+    python -m video_notes process "https://youtu.be/xyz" -o notes.md --whisper-model small
 """
 
 from __future__ import annotations
 
 import logging
-import os
 import sys
 from pathlib import Path
 from typing import Optional
 
 import typer
 from rich.console import Console
-from rich.live import Live
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
-from rich.markdown import Markdown
-from rich.text import Text
+
+# Module-level imports for easier testing/mocking
+from .extractors.youtube import get_youtube_transcript, extract_video_id
+from .extractors.whisper_local import transcribe_local_audio
+from .generators.gemini_notes import generate_notes_smart
 
 # Configure logging
 logging.basicConfig(
@@ -83,12 +84,10 @@ def _get_video_title(source: str) -> str:
     """
     Extract or generate a title for the video.
     
-    For YouTube URLs, this would ideally fetch the actual title.
-    For simplicity, we'll use the video ID or filename.
+    For YouTube URLs, extract the video ID.
+    For local files, use the filename.
     """
     if _is_youtube_url(source):
-        # Extract video ID as fallback title
-        from .extractors.youtube import extract_video_id
         try:
             video_id = extract_video_id(source)
             return f"youtube_{video_id}"
@@ -194,7 +193,6 @@ def process(
                 # YouTube processing
                 progress.update(task, description="[cyan]Fetching YouTube transcript...")
                 
-                from .extractors.youtube import get_youtube_transcript
                 content = get_youtube_transcript(source)
                 
                 # Check if we got audio fallback sentinel
@@ -208,7 +206,6 @@ def process(
                     else:
                         # Transcribe with Whisper
                         progress.update(task, description="[cyan]Transcribing audio with Whisper...")
-                        from .extractors.whisper_local import transcribe_local_audio
                         content = transcribe_local_audio(
                             audio_path,
                             model_size=whisper_model,
@@ -228,7 +225,6 @@ def process(
                 else:
                     # Transcribe with Whisper
                     progress.update(task, description="[cyan]Transcribing with Whisper...")
-                    from .extractors.whisper_local import transcribe_local_audio
                     content = transcribe_local_audio(
                         source,
                         model_size=whisper_model,
@@ -239,8 +235,6 @@ def process(
             
             # Step 2: Generate notes
             progress.update(task, description="[green]Generating notes with Gemini...")
-            
-            from .generators.gemini_notes import generate_notes_smart
             
             # Use streaming for real-time output
             if audio_path and direct_audio:

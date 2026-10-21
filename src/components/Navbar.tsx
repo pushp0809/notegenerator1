@@ -4,8 +4,8 @@ import { Menu, X } from 'lucide-react';
 
 const navLinks = [
   { label: 'Overview', href: '#overview' },
+  { label: 'Test Run', href: '#test-simulation' },
   { label: 'Architecture', href: '#architecture' },
-  { label: 'Tech Stack', href: '#tech-stack' },
   { label: 'Extractors', href: '#implementation' },
   { label: 'Synthesis', href: '#synthesis' },
   { label: 'CLI', href: '#cli' },
