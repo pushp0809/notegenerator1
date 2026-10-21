@@ -85,7 +85,7 @@ def fetch_youtube_content(video_id: str) -> TranscriptResult:
     subtitle: 'Gemini 2.5 Flash Integration',
     icon: <Code2 size={20} />,
     color: 'from-accent-green to-emerald-400',
-    status: 'active',
+    status: 'complete',
     steps: [
       'Initialize google-genai client with API key',
       'Configure gemini-2.5-flash model parameters',
@@ -121,7 +121,7 @@ class GeminiNoteGenerator:
     subtitle: 'User Interface & Formatting',
     icon: <Terminal size={20} />,
     color: 'from-accent-orange to-amber-400',
-    status: 'pending',
+    status: 'active',
     steps: [
       'Build CLI with typer (URL input, file input, options)',
       'Implement rich terminal rendering for live feedback',

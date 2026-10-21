@@ -4,6 +4,7 @@ import Architecture from './components/Architecture';
 import TechStack from './components/TechStack';
 import DirectoryStructure from './components/DirectoryStructure';
 import Implementation from './components/Implementation';
+import SynthesisEngine from './components/SynthesisEngine';
 import Phases from './components/Phases';
 import Setup from './components/Setup';
 import Footer from './components/Footer';
@@ -18,6 +19,7 @@ export default function App() {
         <TechStack />
         <DirectoryStructure />
         <Implementation />
+        <SynthesisEngine />
         <Phases />
         <Setup />
       </main>
