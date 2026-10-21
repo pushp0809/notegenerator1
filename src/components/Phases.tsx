@@ -121,7 +121,7 @@ class GeminiNoteGenerator:
     subtitle: 'User Interface & Formatting',
     icon: <Terminal size={20} />,
     color: 'from-accent-orange to-amber-400',
-    status: 'active',
+    status: 'complete',
     steps: [
       'Build CLI with typer (URL input, file input, options)',
       'Implement rich terminal rendering for live feedback',

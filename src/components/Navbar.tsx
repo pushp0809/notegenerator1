@@ -6,10 +6,10 @@ const navLinks = [
   { label: 'Overview', href: '#overview' },
   { label: 'Architecture', href: '#architecture' },
   { label: 'Tech Stack', href: '#tech-stack' },
-  { label: 'Structure', href: '#structure' },
   { label: 'Extractors', href: '#implementation' },
   { label: 'Synthesis', href: '#synthesis' },
-  { label: 'Phases', href: '#phases' },
+  { label: 'CLI', href: '#cli' },
+  { label: 'Tests', href: '#tests' },
   { label: 'Setup', href: '#setup' },
 ];
 
