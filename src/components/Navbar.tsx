@@ -7,6 +7,7 @@ const navLinks = [
   { label: 'Architecture', href: '#architecture' },
   { label: 'Tech Stack', href: '#tech-stack' },
   { label: 'Structure', href: '#structure' },
+  { label: 'Implementation', href: '#implementation' },
   { label: 'Phases', href: '#phases' },
   { label: 'Setup', href: '#setup' },
 ];

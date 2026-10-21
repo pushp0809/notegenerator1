@@ -20,7 +20,7 @@ const phases: Phase[] = [
     subtitle: 'Foundation & Dependencies',
     icon: <Settings size={20} />,
     color: 'from-primary to-primary-light',
-    status: 'active',
+    status: 'complete',
     steps: [
       'Create directory structure with all modules',
       'Generate pyproject.toml with locked dependency versions',
@@ -50,7 +50,7 @@ dependencies = [
     subtitle: 'Content Retrieval Pipeline',
     icon: <Code2 size={20} />,
     color: 'from-accent to-cyan-400',
-    status: 'pending',
+    status: 'complete',
     steps: [
       'Implement YouTube transcript fetching via youtube-transcript-api',
       'Build yt-dlp audio download fallback',
@@ -85,7 +85,7 @@ def fetch_youtube_content(video_id: str) -> TranscriptResult:
     subtitle: 'Gemini 2.5 Flash Integration',
     icon: <Code2 size={20} />,
     color: 'from-accent-green to-emerald-400',
-    status: 'pending',
+    status: 'active',
     steps: [
       'Initialize google-genai client with API key',
       'Configure gemini-2.5-flash model parameters',
