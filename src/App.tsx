@@ -8,6 +8,7 @@ import SynthesisEngine from './components/SynthesisEngine';
 import CLI from './components/CLI';
 import Tests from './components/Tests';
 import TestSimulation from './components/TestSimulation';
+import Configuration from './components/Configuration';
 import Phases from './components/Phases';
 import Setup from './components/Setup';
 import Footer from './components/Footer';
@@ -19,6 +20,7 @@ export default function App() {
       <main>
         <Hero />
         <TestSimulation />
+        <Configuration />
         <Architecture />
         <TechStack />
         <DirectoryStructure />

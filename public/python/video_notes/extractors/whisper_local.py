@@ -23,6 +23,8 @@ import tempfile
 from pathlib import Path
 from typing import Optional
 
+from ..config import get_config
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -237,9 +239,9 @@ def _format_segments_with_timestamps(
 
 def transcribe_local_audio(
     file_path: str,
-    model_size: str = "base",
+    model_size: Optional[str] = None,
     language: Optional[str] = None,
-    cleanup: bool = True,
+    cleanup: Optional[bool] = None,
 ) -> str:
     """
     Transcribe a local audio file using faster-whisper.
@@ -251,14 +253,14 @@ def transcribe_local_audio(
     ----------
     file_path : str
         Path to the audio file (mp3, m4a, wav, etc.).
-    model_size : str
+    model_size : str, optional
         Whisper model size. One of: tiny, base, small, medium, large-v2, large-v3.
-        Default: "base" (good balance of speed and accuracy).
+        Default: from config (WHISPER_MODEL_SIZE env var, defaults to "base").
     language : str, optional
         Force a specific language code (e.g., "en"). If None, auto-detect.
-    cleanup : bool
+    cleanup : bool, optional
         Whether to delete the audio file after transcription (only for temp files).
-        Default: True.
+        Default: from config (CLEANUP_TEMP_FILES env var, defaults to True).
 
     Returns
     -------
@@ -276,6 +278,15 @@ def transcribe_local_audio(
     TranscriptionError
         If transcription fails for any other reason.
     """
+    # -----------------------------------------------------------------------
+    # Load config defaults
+    # -----------------------------------------------------------------------
+    config = get_config()
+    if model_size is None:
+        model_size = config.whisper_model_size
+    if cleanup is None:
+        cleanup = config.cleanup_temp_files
+
     # -----------------------------------------------------------------------
     # Pre-flight checks
     # -----------------------------------------------------------------------

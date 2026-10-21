@@ -20,13 +20,14 @@ import os
 from pathlib import Path
 from typing import Generator, Optional, Union
 
+from ..config import get_config, MissingAPIKeyError
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 
-MODEL_NAME = "gemini-2.5-flash"
 DIRECT_UPLOAD_THRESHOLD_MB = 25  # Upload files > 25MB directly to Gemini
 SUPPORTED_AUDIO_EXTENSIONS = {".mp3", ".m4a", ".wav", ".ogg", ".opus", ".flac", ".webm", ".mp4"}
 
@@ -59,32 +60,6 @@ class RateLimitError(SynthesisError):
 # Client initialization
 # ---------------------------------------------------------------------------
 
-def _get_api_key() -> str:
-    """
-    Retrieve the Gemini API key from environment variables.
-
-    Returns
-    -------
-    str
-        The API key.
-
-    Raises
-    ------
-    APIKeyError
-        If the key is not set or empty.
-    """
-    api_key = os.environ.get("GEMINI_API_KEY", "").strip()
-
-    if not api_key:
-        raise APIKeyError(
-            "GEMINI_API_KEY environment variable is not set.\n"
-            "Get your API key at: https://aistudio.google.com/apikey\n"
-            "Then set it: export GEMINI_API_KEY=your_key_here"
-        )
-
-    return api_key
-
-
 def _init_client():
     """
     Initialize the Gemini client.
@@ -109,11 +84,13 @@ def _init_client():
             "Install it with: pip install google-genai"
         )
 
-    api_key = _get_api_key()
+    config = get_config()
+    api_key = config.get_gemini_api_key(required=True)
+    model_name = config.gemini_model
 
     try:
         client = genai.Client(api_key=api_key)
-        logger.info("Gemini client initialized (model=%s)", MODEL_NAME)
+        logger.info("Gemini client initialized (model=%s)", model_name)
         return client
     except Exception as exc:
         raise ModelError(f"Failed to initialize Gemini client: {exc}") from exc
@@ -230,14 +207,15 @@ def generate_notes_from_text(
 
 def _generate_text_response(client, user_prompt: str, system_instruction: str) -> str:
     """Generate a complete text response (non-streaming)."""
+    config = get_config()
     response = client.models.generate_content(
-        model=MODEL_NAME,
+        model=config.gemini_model,
         contents=[
             {"role": "user", "parts": [{"text": user_prompt}]}
         ],
         config={
             "system_instruction": system_instruction,
-            "temperature": 0.3,  # Lower temperature for factual accuracy
+            "temperature": config.temperature,
         },
     )
 
@@ -254,14 +232,15 @@ def _stream_text_response(
     system_instruction: str,
 ) -> Generator[str, None, None]:
     """Stream text response chunks for real-time rendering."""
+    config = get_config()
     response_stream = client.models.generate_content_stream(
-        model=MODEL_NAME,
+        model=config.gemini_model,
         contents=[
             {"role": "user", "parts": [{"text": user_prompt}]}
         ],
         config={
             "system_instruction": system_instruction,
-            "temperature": 0.3,
+            "temperature": config.temperature,
         },
     )
 
@@ -365,15 +344,16 @@ def _generate_audio_response(
     system_instruction: str,
 ) -> str:
     """Generate notes from uploaded audio file (non-streaming)."""
+    config = get_config()
     response = client.models.generate_content(
-        model=MODEL_NAME,
+        model=config.gemini_model,
         contents=[
             uploaded_file,
             {"role": "user", "parts": [{"text": user_prompt}]}
         ],
         config={
             "system_instruction": system_instruction,
-            "temperature": 0.3,
+            "temperature": config.temperature,
         },
     )
 
@@ -391,15 +371,16 @@ def _stream_audio_response(
     system_instruction: str,
 ) -> Generator[str, None, None]:
     """Stream notes from uploaded audio file."""
+    config = get_config()
     response_stream = client.models.generate_content_stream(
-        model=MODEL_NAME,
+        model=config.gemini_model,
         contents=[
             uploaded_file,
             {"role": "user", "parts": [{"text": user_prompt}]}
         ],
         config={
             "system_instruction": system_instruction,
-            "temperature": 0.3,
+            "temperature": config.temperature,
         },
     )
 

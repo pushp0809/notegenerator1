@@ -30,9 +30,13 @@ from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
 
 # Module-level imports for easier testing/mocking
+from .config import get_config, load_dotenv, validate_config
 from .extractors.youtube import get_youtube_transcript, extract_video_id
 from .extractors.whisper_local import transcribe_local_audio
 from .generators.gemini_notes import generate_notes_smart
+
+# Load .env file if it exists
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(
@@ -117,10 +121,10 @@ def process(
         "--output", "-o",
         help="Output Markdown file path (default: ./notes/<title>.md)"
     ),
-    whisper_model: str = typer.Option(
-        "base",
+    whisper_model: Optional[str] = typer.Option(
+        None,
         "--whisper-model",
-        help="Whisper model size for transcription (tiny, base, small, medium, large-v3)"
+        help="Whisper model size for transcription (tiny, base, small, medium, large-v3). Default: from config"
     ),
     direct_audio: bool = typer.Option(
         False,
@@ -140,10 +144,26 @@ def process(
       - A YouTube URL (youtube.com, youtu.be, shorts)
       - A local file path (.mp4, .mkv, .mp3, .wav, etc.)
     """
+    # Load configuration
+    config = get_config()
+    
     # Set log level
     if verbose:
         logging.getLogger().setLevel(logging.DEBUG)
         logger.debug("Verbose logging enabled")
+    else:
+        logging.getLogger().setLevel(config.log_level)
+    
+    # Validate that at least one AI provider is configured
+    try:
+        validate_config()
+    except Exception as exc:
+        console.print(f"[red]✗ Configuration Error:[/red] {exc}")
+        raise typer.Exit(1)
+    
+    # Use config defaults if not provided
+    if whisper_model is None:
+        whisper_model = config.whisper_model_size
     
     # Validate source exists (for local files)
     if not _is_youtube_url(source):
@@ -159,7 +179,7 @@ def process(
     if output is None:
         title = _get_video_title(source)
         sanitized = _sanitize_filename(title)
-        output = Path("./notes") / f"{sanitized}.md"
+        output = config.ensure_output_dir() / f"{sanitized}.md"
     
     _ensure_output_dir(output)
     

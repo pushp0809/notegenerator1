@@ -5,6 +5,7 @@ import { Menu, X } from 'lucide-react';
 const navLinks = [
   { label: 'Overview', href: '#overview' },
   { label: 'Test Run', href: '#test-simulation' },
+  { label: 'Config', href: '#configuration' },
   { label: 'Architecture', href: '#architecture' },
   { label: 'Extractors', href: '#implementation' },
   { label: 'Synthesis', href: '#synthesis' },
